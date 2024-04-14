@@ -1,14 +1,23 @@
 # Predicting Movie Ratings with Critic Reviews Using Classification Models
 Shriyan Dey, CSE 163 Final Project
-Report - Predicting Movie Ratings with Critic Reviews Using Classification Models
-Summary
+
+#### Summary
 Research Questions:
 
-Is it possible to somewhat accurately predict the Rotten Tomato status just by reading the critics’ reviews?
+1. Is it possible to somewhat accurately predict the Rotten Tomato status just by reading the critics’ reviews?
 
-Which ML model (and with vectorizer and parameters) most accurately does so?
 
-What distinct and key terms indicate a negative (“Rotten”) and a positive (“Fresh”) review towards a movie?
+
+2. Which ML model (and with vectorizer and parameters) most accurately does so?
+
+
+
+3. What distinct and key terms indicate a negative (“Rotten”) and a positive (“Fresh”) review towards a movie?
+
+
+
+
+
 
 Answers:
 
