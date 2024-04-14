@@ -1,29 +1,93 @@
-# Predicting Movie Ratings with Critic Reviews Using Classification Models
-Shriyan Dey, CSE 163 Final Project
+# Predicting Movie Ratings with Critic Reviews Using Classification Models - Report
+##### Shriyan Dey, CSE 163 Final Project
 
 #### Summary
 Research Questions:
 
 1. Is it possible to somewhat accurately predict the Rotten Tomato status just by reading the critics’ reviews?
 
-
-
 2. Which ML model (and with vectorizer and parameters) most accurately does so?
-
-
 
 3. What distinct and key terms indicate a negative (“Rotten”) and a positive (“Fresh”) review towards a movie?
 
 
-
-
-
-
 Answers:
 
-Yes, critic reviews can be an indicator on a movie’s Rotten Tomato status.
+1. Yes, critic reviews can be an indicator on a movie’s Rotten Tomato status.
 
-Bernoulli Naive Bayes Classifier, ‘alpha’ = 0.76, either vectorizer
+2. Bernoulli Naive Bayes Classifier, ‘alpha’ = 0.76, either vectorizer
+   
+3. Some key terms that indicate a negative review are “actors”, “people”, “enough”, “lost”, “much”, “make”, and “may”. For positive reviews, key terms were “first”, “characters”, “best”, “one”, “well”, “comedy”, “great”, and “holofcener.”
 
-Some key terms that indicate a negative review are “actors”, “people”, “enough”, “lost”, “much”, “make”, and “may”. For positive reviews, key terms were “first”, “characters”, “best”, “one”, “well”, “comedy”, “great”, and “holofcener.”
+
+#### Motivation 
+Although this project’s focus on movies isn’t the most ideal context, this genre of data analysis project can be a core tool for businesses around the world. Maintaining a successful business, whether it be a small film production company or a large-scale tech giant, is hard to do due to the ever-changing market trends and interests of the consumers. Many companies attempt to leverage data-driven insights by analyzing the sentiment of their clients through reviews or surveys. As businesses are only as successful as their clients make them, feedback is a vital component to any consumer-oriented company. By automating the analysis of feedback, one can approach general conclusions about the consumers’ opinions on their product or service and address any potential inconveniences. Ultimately, this can lead to profits being maximized, losses being minimized, and companies finding the perfect equilibrium that their business should fall in in that state of the market cycle. In this project, I’ll demonstrate a basic sentiment analysis program with which companies can make more well-informed decisions on how to market, distribute, and create their content and/or services to their clients.
+
+
+#### Data Setting
+
+**Kaggle link to both data sets: https://www.kaggle.com/datasets/stefanoleone992/rotten-tomatoes-movies-and-critic-reviews-dataset?select=rotten_tomatoes_critic_reviews.csv**
+
+I found this pair of data sets on Kaggle. The first was of the critic reviews for the movies and the columns included general information about the movie (like the id) but mostly revolved around parts of the critic reviews such as the publishers the critics work for, the critics’ names, the ratings, the date the review was published, and the actual text content of the reviews. The second data set is about the details of the movies themselves. Column categories included release date, a movie description, the movie name, content rating, the actors, the director, and the genres.
+
+To generate a suitable data set for the project, I merged these two on the movie_id column because this was a unique identifier for all the movies. After this, I filtered out all of the excess data I didn’t need (including removing rows with NaN values) and kept columns like movie name, review content, review type, and tomatometer status. After this initial preprocessing of the data, I moved onto more complex preprocessing steps that I had to take because of the nature of the data. A way the context of the data complicated my analysis was just the fact that it was all sentences and words. The reason this complicated my analysis is because classification models require numerical input data to predict patterns and couldn’t do it with non-numerical data. At first, I attempted to use the Label Encoding method to give each unique word in the corpus of all the reviews a numerical value and essentially substituting each word with a number one-for-one. This approach took a lot of unnecessarily complicated code and was inefficient to run. Needing to pivot, I resorted to tokenizing the data using two techniques (described in the Method section). An aspect of the data that could deepen my analysis were the various other columns of data I could use to predict the tomatometer status. While using all of these data points probably would’ve led to a more accurate model, it would complicate it (as it needs so many pieces of data to function) and take away from the motivation of this exploration. I wanted to determine how well classification models could differentiate between negative and positive sentiments in word-based reviews. Adding numbers and numerical ratings makes it almost useless to use the actual content of the review (at the beginning of this project, I factored in the top_critic column into the models and got 100% accuracy). So, I intentionally left out data to develop an accurate sentiment analysis model. Lastly, the data itself wasn’t the most representative of actual reviews viewers would likely leave on movies or clients would leave for companies. All the reviews from the data set are exclusively written by professional critics. Although this probably does mean that the data is grammatically correct and the opinions have experience behind them, it it’s fully representative of most real-world feedback data. Therefore, if we were to implement this approach with real user data from casual consumers, there could be a drastically different result.
+
+#### Method.
+This project will approach the question—how can we accurately predict the Rotten Tomato rating of a movie using critics’ reviews. 
+
+1. To do this, the first step was preprocessing the data. With both data sets, I used pandas to merge them on the movie_id column. Then, I filtered out all unnecessary columns and was left with the movie title, review content, review type, and tomatometer status columns.
+
+2. As there was text input data being fed into the classification models, vectorization (turning words into matrices of numbers) was a necessary step. To accomplish this, I used both the Bag Of Words and TF-IDF vectorization method separately to later on see which method would result in a more accurate model. I used both vectorization methods to tokenize the ‘X’ data for each model I tested and marked this distinction with subscripts in the models’ variable names. After this, I used one-hot encoding to replace the ‘Rotten’ and ‘Fresh’ values for the with 0 and 1, following the same principle of replacing text data with numerical values.
+
+3. Before fitting the various models with the new, vectorized data, I generated two word clouds (a new Python library which formats words in a corpus artistically, where the font size of each word is proportional to its frequency in the corpus) to show the most frequency words in the positive and negative reviews. This was to get a better understanding of the basic differences in language that critics used to critique and praise movies. Also with this, I was able to answer my third research question.
+
+4. At this point, the preprocessing stage is complete and it’s time to train the models. In this project, I trained five distinct machine learning models with the reviews data set: Decision Tree, Random Forest, k-Nearest Neighbors, Naive Bayes, and Neural Networks. Each had their own classifier object in the scikit-learn library so it was just a matter of writing code to fit them to the data of both tf-idf and bow vectorizations. (Note: for the random forest classifier, I also trained a weighted version based on the distribution of the classes in the data set and for the naive bayes category, I trained four versions of it: Gaussian, Multinomial, Complement, and Bernoulli). While training these models, I kept track of them by adding them to a Set to be used in metric comparison. Also, for each pair of models trained (tf-idf & bow) I plotted a confusion matrix to show how effective the model was at predicting correctly.
+
+5. After training had been done, I iterated through the Set storing all of the models and got all the needed metrics, including precision, recall, accuracy, F1 score, and PR-AUC. I stored each model’s metrics in a pandas DataFrame. Then, to compare the models, I concatenated all the DataFrames and created a large DatFrame with information on all the models’ performance. This made it easy for me to determine which model could predict rating sentiment best: the Bernoulli Naive Bayes Classifier.
+With a best-performing model, I utilized scikit-learn’s GridSearchCV object to fine-tune the hypermaters of the BNB Classifier. The only appropriate hyperparameter for naive bayes classifiers is the ‘alpha’ parameter, so I tested various values between 0-1 in the cross-validation. Following the cross-validation, the search determined that the best alpha value was 0.76. So, with this adjusted hyperparameter, we have the best predictive model.
+
+
+#### Results
+
+1. Is it possible to somewhat accurately predict the Rotten Tomato status just by reading the critics’ reviews?
+
+    Yes, it’s possible to somewhat accurately predict the tomatometer status of a movie from critic reviews. The way I approached answering this question was by using binary classification models from scikit-learn. After testing several types of models, I fine-tuned the hyperparameters of the best predictive model that ultimately was able to predict correctly 76% of the time. I knew that programs were capable of detecting positive and negative sentiment through approaches like NLP. With natural language processing, there are many more complex steps that look at the words themselves. These include stemming and lemmatization which process the words in their simplest, root forms. However, I didn’t know if a simple model could take vectorized sentences and find patterns in positive and negative sentiments. I did expect to arrive at an at least 85% success rate.
+
+2. Which ML model (and with vectorizer and parameters) most accurately does so?
+   
+    I found out that at the maximum data capacity for the kernel to process (10000 rows), the most effective model was the Bernoulli Naive Bayes Classifier with an alpha parameter of 0.74. Before the project I really had no idea which model would classify the data most accurately but I thought I knew which vectorization would work better. I thought that since text data was being analyzed over a large corpus, the tf-idf vectorizer would weight less frequent words higher and this would allow models to catch extreme words on either side of the spectrum and thus have an easier time accurately sorting them. While this was true for most of the other models, the vectorization had no effect whatsoever on the BernoulliNB Classifier. I don’t fully understand why but it might be the way the classifier works on a deeper level. Along with it being the highest scoring in every metric, BernoulliNB’s confusion matrix was by far the most even one out of the lot. It’s clear with visual and numerical evidence that the BernoulliNB classifier was the most successful at predicting critics’ review sentiment.
+
+3. What distinct and key terms indicate a negative (“Rotten”) and a positive (“Fresh”) review towards a movie?
+
+    From the word cloud plots I created, determined the following: key terms that indicate a negative review are “actors”, “people”, “enough”, “lost”, “much”, “make”, “may”, and “cgi” and those for positive reviews were “first”, “characters”, “best”, “one”, “well”, “comedy”, “great”, and “holofcener.” In both, the most common two words were “film” and “movie.” It makes sense that in both positive and negative reviews, critics used those two words the most so this didn’t surprise me. What I was surprised by, however, was how much this data makes sense. When people critique movies, they usually blame the actors, the people in the movie, or even the cgi. These were all common amongst the negative reviews. On the other side, when people praise a movie, they talk about how great it was, how it was the best one in the franchise, or how they love comedies. As intuitive and basic these correlations seem to humans, the fact that a computer program can pick these up shows that the data is both accurate and the models are able to differentiate between these sentiments using these word patterns. (Note: an interesting word for the positive reviews that had a weirdly high frequency  was “holofcener.” That’s the last name of director Nicole Holofcener who directed a couple average movies and TV shows. This is the only inconsistency in the data that I found from the world clouds).
+
+
+#### Impact and Limitations
+
+With the results I gathered from this project, there are inevitably both implications and limitations, starting with the ideal ML model for text-based sentiment analysis being the Bernoulli Naive Bayes Classifier. Out of the research I had done on common binary classification models and the results of my testing, my project arrived at this very conclusion. However, there were many limitations that hindered me from verifying if this was actually true, the largest of which being the data size. The total post-processed data set contains over 1.1 million rows. Obviously for machine learning and training models, more data would lead to more accurate answers. I found this when I incrementally increased the amount of data I used and got proportionally better results. However, the limit on the amount of data my program and kernel could process before crashing was ~10000 rows of data. This isn’t nearly the 1.1 million that I could’ve processed and with all of this data, other models could’ve learned to analyze sentiment better than the BernoulliNBC. Another limitation of this data is that it only utilized critic reviews. This favors critics’ opinions to those of regular audience members—the perspective that movie companies would probably care more about. For any business, the intended consumer’s feedback is the most important for driving goals and profitability, and for movies it’s not the critics but the audience. Therefore, my predictions shouldn’t be used to jump to conclusions about the general audience’s sentiment on movies. Finally, I didn’t use more apt approaches to problems like this (for example NLP), and didn’t experiment with every single hyperparameter and model because of limited memory space. 
+
+
+#### Challenge Goals
+
+1. New Library
+
+    In my proposal, my first challenge goal I wanted to meet was working with multiple data sets. When I’d come up with the original idea for the project and found the Kaggle of two related datasets, I thought this would be a prerequisite for me anyways. However, when I changed my project from working with both word-based and numerical/categorical data to just the critics’ reviews, I no longer needed to use the second data set. So, instead, I decided to focus on the words of the reviewers, and python’s wordcloud library was a great tool to visualize the distribution of the specific vocabulary in the reviews. As seen in my code, I generated two word clouds (split for positive and negative reviews).
+
+2. Machine Learning
+
+   This goal stayed relatively the same throughout the project, even when I changed the trajectory of it midway through. I trained five different types of scikit-learn classifiers, two more than I aimed for. When I decided to focus on one data set, I did so in part because I wanted to focus more on the model-training aspect of the process. My goal with the new (and current) project was to learn more about the strengths and drawbacks of different types of classification models and observe the data-training process rather than the data itself. Along with this, I worked with vectorizers, cross-validation hyperparameter tuning, and model metrics. Learning the basics of machine learning was by far the part of the project I enjoyed most.
+
+
+#### Plan Evaluation
+My proposed work plan estimates were very far from the reality of how long it actually took to complete this project. Part of the reason why was because I slightly changed the direction of my project halfway through completing my original proposal plan. This was because there were technical difficulties achieving the goals with the original and I decided that I wanted to explore more about the various classification models and fine-tuning with word-based data rather than simply using numerical data points as we did in class. In the end, the amount of time I took writing the code, researching documentation, writing tests, learning about machine learning and language processing techniques, and debugging was approximately 40 hours which was double the amount of time I expected to spend on this project.
+
+
+#### Testing
+In terms of testing, there was very little I could actually test. A majority of my code was centered around the classification models which I fit and trained with the data. To test these models, I implemented some of the techniques we used during our machine learning lessons in class including fine-tuning hyperparameters using GridSearchCV and validating the accuracy of the models using various metrics like precision, recall, accuracy, F1 score, and PR-AUC. I also plotted confusion matrices for each of the models before and after fine-tuning their hyperparameters which are classification models’ equivalent for a linear regression plot. Confusion matrices made determining the accuracy of the models very intuitive and quick. Using a combination of these three methods, I found best to test such a wide variety of ML models. On top of these functions though, I defined some functions which could be tested. For these, I mainly used assert statements where I could like we practiced throughout the quarter. Some of the methods I wrote produced visualizations (like the confusion matrices and word clouds). Although I tried to find ways to test these methods online, I never found a succinct answer. Instead, to verify these methods, I made sure to follow the documentation closely but more importantly, cross-reference what the visualization displayed with the numerical data that I could actually verify (from the show_metrics() method) which were directly produced from scikit-learn’s class methods. Finally, for the last method I had in the file, which printed out the prediction for a given movie title, I simply used doctests. I opted for doctests over assert statements because the method didn’t return anything and instead printed out the output to the console. This was paired with checking whether the actual tomatometer status of the movie was the same as the predicted one (this last test is more of a testament to how well the predictive model worked and not so much about testing if the code works as intended). 
+
+
+#### Collaboration
+During the completion of this project, I mainly used online articles, guides, and the scikit-learn documentation to write my code. I worked on this project individually and didn’t consult any course staff nor did I use any generative AI. The large part of the research I did was from small syntaxical questions I had with pandas, matplotlib, wordcloud, or the various models, and finding out about concepts I didn’t know like the model metrics and hyperparameter tuning. The main online sources I used for this project can be found in the last cell of my Jupyter Notebook.
+
+ 
 
